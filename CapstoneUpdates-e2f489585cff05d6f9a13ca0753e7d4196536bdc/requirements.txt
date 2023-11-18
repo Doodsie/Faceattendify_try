@@ -1,0 +1,14 @@
+opencv-contrib-python-headless
+blinker
+click
+colorama
+Flask
+gunicorn
+itsdangerous
+Jinja2
+MarkupSafe
+mysql-connector
+numpy
+Pillow
+Werkzeug
+mysql-connector-python

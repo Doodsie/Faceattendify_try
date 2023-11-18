@@ -1,0 +1,147 @@
+{% include "header.html" %}
+<div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header card-header-icon" data-background-color="purple">
+                                    <i class="material-icons">assignment</i>
+                                </div>
+                                <div class="card-content">
+                                    <h4 class="card-title"><b>Create new Channel</b></h4>
+                                    <form role="form" action="{{ url_for('groups') }}" method="post">
+                                        <div class="form-group label-floating">
+                                            <label class="control-label">Course Name</label>
+                                            <input type="text" class="form-control" name="group_name" required>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-fill btn-rose">Create Course</button>
+                                    </form>
+                                </div>
+
+                                <!-- end content-->
+                            </div>
+                            <!--  end card  -->
+                        </div>
+                        <!-- end col-md-12 -->
+
+						<div class="md-6">
+                            <div class="card">
+                                <div class="card-header card-header-icon" data-background-color="rose">
+                                    <i class="material-icons">mail_outline</i>
+                                </div>
+                                <div class="card-content">
+                                    <h4 class="card-title"><b>Course Channels</b></h4>
+                                    <div class="toolbar">
+                                    </div>
+                                    <div class="material-datatables">
+                                        <table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%; text-transform:capitalize;">
+                                            <thead>
+                                                <tr>
+                                                    <th><b>Courses</b></th>
+                                                    <th><b>Date and time created</b></th>
+                                                    <th class="disabled-sorting text-right"><b>Actions</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr>
+                                                    <th><b>Courses</b></th>
+                                                    <th><b>Date and time created</b></th>
+                                                    <th class="text-right"><b>Actions</b></th>
+                                                </tr>
+                                            </tfoot>
+                                            <tbody>
+    {% for item in data %}
+    <tr>
+        <td><a class="btn btn-primary btn-lg" href='/agrouplist?group_id={{ item[0] }}&action=view_members&groupteacher={{ session.user_name }}&groupname={{ item[1] }}'>{{ item[1] }}</a></td>
+        <td>{{ item[2] }}</td>
+        <td class="text-right">
+            <button class="btn btn-warning btn-sm rename-button" data-group-id="{{ item[0] }}" data-group-name="{{ item[1] }}">Rename  <i class="material-icons">create</i>  </button>
+            <a class="btn btn-danger btn-sm" href='delete?id={{ item[0] }}&tname=groups&rurl=groups' onclick="return confirm('Are you sure you want to remove this group?')">Delete  <i class="material-icons">close</i></a>
+
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- end row -->
+                </div>
+            </div>
+
+{% include "footer.html" %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#datatables').DataTable({
+            "pagingType": "full_numbers",
+            "lengthMenu": [
+                [10, 25, 50, -1],
+                [10, 25, 50, "All"]
+            ],
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records",
+            }
+
+        });
+
+
+        var table = $('#datatables').DataTable();
+
+        // Edit record
+        table.on('click', '.edit', function() {
+            $tr = $(this).closest('tr');
+
+            var data = table.row($tr).data();
+            //alert('You press on Row: ' + data[0] + ' ' + data[1] + ' ' + data[2] + '\'s row.');
+        });
+
+        // Delete a record
+        table.on('click', '.remove', function(e) {
+            $tr = $(this).closest('tr');
+            table.row($tr).remove().draw();
+            e.preventDefault();
+        });
+
+        //Like record
+        table.on('click', '.like', function() {
+            alert('You clicked on Like button');
+        });
+
+        $('.card .material-datatables label').addClass('form-group');
+    });
+
+	$('.header_nav').removeClass('active');
+	$('.groups').addClass('active');
+	$('#header_page_title').html('Course Channel');
+
+      $(document).ready(function () {
+        // Handle the "Rename" button click
+        $(".rename-button").click(function () {
+            const groupId = $(this).data("group-id");
+            const currentName = $(this).data("group-name");
+
+            // Prompt the user to enter a new name
+            const newName = prompt("Rename the group:", currentName);
+
+            if (newName) {
+                // Update the group name in the table
+                $(this).data("group-name", newName);
+                $(this).closest("tr").find("a.btn-primary").text(newName);
+
+                // Send an AJAX request to update the group name in the backend
+                $.post("/groups", {
+                    group_id: groupId,
+                    new_group_name: newName
+                });
+            }
+        });
+    });
+</script>
+
